@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Web;
 using System.Web.Services;
@@ -17,10 +18,36 @@ namespace SOAP_asmx
     // [System.Web.Script.Services.ScriptService]
     public class WebService1 : System.Web.Services.WebService
     {
+        public byte[] ConvertStreamToByteBuffer(System.IO.Stream theStream)
+        {
+            int b1;
+            System.IO.MemoryStream tempStream = new System.IO.MemoryStream();
+            while ((b1 = theStream.ReadByte()) != -1)
+            {
+                tempStream.WriteByte(((byte)b1));
+            }
+            return tempStream.ToArray();
+        }
+
         [WebMethod]
         public string HelloWorld()
         {
             return "Привет всем!";
+        }
+
+        [WebMethod]
+        public byte[] GetFile()
+        {
+            try
+            {
+                ///Open and read a file&#12290;
+                FileStream fileStream = File.OpenRead(@"c:\Temp\Снимок.JPG");
+                return ConvertStreamToByteBuffer(fileStream);
+            }
+            catch (Exception ex)
+            {
+                return new byte[0];
+            }
         }
 
         [WebMethod]
@@ -30,7 +57,7 @@ namespace SOAP_asmx
             return pers;
         }
         /*
-         <?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <soap12:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap12="http://www.w3.org/2003/05/soap-envelope">
   <soap12:Body>
     <GetPerson xmlns="http://goga.org/">
